@@ -178,10 +178,7 @@ class StreamSocketClient
      */
     public function getSocket()
     {
-        // lazy initializing of socket-descriptor
-        if (!$this->socket) {
-            $this->socket = $this->buildSocket();
-        }
+        $this->socket = $this->buildSocket();
 
         return $this->socket;
     }
