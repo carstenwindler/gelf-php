@@ -208,7 +208,20 @@ class StreamSocketClient
         }
 
         if ($byteCount !== $bufLen) {
-            throw new \RuntimeException("Incomplete write: Only $byteCount of $bufLen written");
+            // try to reconnect one time if 0 bytes written
+            // should probably be done only if $byteCount is 0
+            // so we don't resend incomplete messages?
+            $this->close();
+            $socket = $this->getSocket();
+            $byteCount = @fwrite($socket, $buffer);
+            $bufLen = strlen($buffer);
+
+            if ($byteCount === false) {
+                throw new \RuntimeException("Failed to write to socket");
+            }
+            if ($byteCount !== $bufLen) {
+                throw new \RuntimeException("Incomplete write: Only $byteCount of $bufLen written");
+            }
         }
 
         return $byteCount;
